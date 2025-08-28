@@ -31,6 +31,7 @@ enum BackgroundOption: Identifiable {
 }
 
 struct SettingsView: View {
+    var onDismiss: (() -> Void)? = nil
     @AppStorage("userName") private var userName: String = "Guest"
     @AppStorage("backgroundMedia") private var backgroundMedia: String = "back1"
     @AppStorage("zipCode") private var zipCode: String = ""
@@ -122,6 +123,7 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+        .onDisappear { onDismiss?() }
     }
 
     private var backgroundPreview: some View {

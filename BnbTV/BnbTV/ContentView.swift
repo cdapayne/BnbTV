@@ -48,6 +48,7 @@ struct ContentView: View {
     @State private var weather: WeatherData?
     @State private var currentDate: Date = Date()
     @State private var audioPlayer: AVAudioPlayer?
+    @Environment(\.scenePhase) private var scenePhase
 
     private let actions = HomeAction.allCases
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
@@ -108,7 +109,7 @@ struct ContentView: View {
                         Text("\(weather.description) \(Int(weather.temperature))°F")
                             .font(.footnote)
                     }
-                    NavigationLink(destination: SettingsView()) {
+                    NavigationLink(destination: SettingsView(onDismiss: { playMusic() })) {
                         Image(systemName: "gearshape")
                             .font(.system(size: 40))
                     }
@@ -123,7 +124,13 @@ struct ContentView: View {
             }
             .onReceive(timer) { currentDate = $0 }
             .onAppear { playMusic() }
-            .onChange(of: homeMusicName) { _ in playMusic() }
+            .onChange(of: scenePhase) { phase in
+                if phase == .active {
+                    playMusic()
+                } else {
+                    audioPlayer?.stop()
+                }
+            }
         }
     }
 
