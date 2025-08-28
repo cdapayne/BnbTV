@@ -8,6 +8,7 @@
 import SwiftUI
 import UIKit
 import AVKit
+import AVFoundation
 
 /// Represents the buttons shown along the bottom of the home screen.
 enum HomeAction: String, CaseIterable, Identifiable {
@@ -41,9 +42,13 @@ struct ContentView: View {
     @AppStorage("userName") private var userName: String = "Guest"
     @AppStorage("backgroundMedia") private var backgroundMediaName: String = ""
     @AppStorage("zipCode") private var zipCode: String = ""
+    @AppStorage("homeMusic") private var homeMusicName: String = ""
+    @AppStorage("buttonColor") private var buttonColorName: String = "transparentGrey"
 
     @State private var weather: WeatherData?
     @State private var currentDate: Date = Date()
+    @State private var audioPlayer: AVAudioPlayer?
+    @Environment(\.scenePhase) private var scenePhase
 
     private let actions = HomeAction.allCases
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
@@ -71,7 +76,7 @@ struct ContentView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 40) {
                             ForEach(actions) { action in
-                                NavigationLink(destination: PlaceholderView(title: action.rawValue)) {
+                                NavigationLink(destination: destinationView(for: action)) {
                                     VStack {
                                         Image(systemName: action.systemImage)
                                             .resizable()
@@ -80,10 +85,7 @@ struct ContentView: View {
                                         Text(action.rawValue)
                                     }
                                 }
-                                .buttonStyle(.plain)
-                                .frame(width: 400, height: 220)
-                                .background(Color.white.opacity(0.3))
-                                .cornerRadius(20)
+                                .buttonStyle(HomeButtonStyle(color: color(for: buttonColorName)))
                             }
                         }
                         .padding(.horizontal)
@@ -104,7 +106,7 @@ struct ContentView: View {
                         Text("\(weather.description) \(Int(weather.temperature))°F")
                             .font(.footnote)
                     }
-                    NavigationLink(destination: SettingsView()) {
+                    NavigationLink(destination: SettingsView(onDismiss: { playMusic() })) {
                         Image(systemName: "gearshape")
                             .font(.system(size: 40))
                     }
@@ -118,6 +120,14 @@ struct ContentView: View {
                 Task { await refreshWeather() }
             }
             .onReceive(timer) { currentDate = $0 }
+            .onAppear { playMusic() }
+            .onChange(of: scenePhase) { phase in
+                if phase == .active {
+                    playMusic()
+                } else {
+                    audioPlayer?.stop()
+                }
+            }
         }
     }
 
@@ -151,8 +161,43 @@ struct ContentView: View {
         case "red": return .red
         case "green": return .green
         case "blue": return .blue
+        case "white": return .white
+        case "black": return .black
+        case "transparentgrey": return Color.gray.opacity(0.3)
         default: return .blue
         }
+    }
+
+    @ViewBuilder
+    private func destinationView(for action: HomeAction) -> some View {
+        switch action {
+        case .rules:
+            HouseRulesView()
+        default:
+            PlaceholderView(title: action.rawValue)
+        }
+    }
+
+    private struct HomeButtonStyle: ButtonStyle {
+        let color: Color
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .frame(width: 400, height: 220)
+                .background(color)
+                .overlay(Color.gray.opacity(configuration.isPressed ? 0.4 : 0))
+                .cornerRadius(20)
+        }
+    }
+
+    private func playMusic() {
+        audioPlayer?.stop()
+        guard !homeMusicName.isEmpty else { return }
+        let base = (homeMusicName as NSString).deletingPathExtension
+        let ext = (homeMusicName as NSString).pathExtension
+        guard let url = Bundle.main.url(forResource: base, withExtension: ext) else { return }
+        audioPlayer = try? AVAudioPlayer(contentsOf: url)
+        audioPlayer?.numberOfLoops = -1
+        audioPlayer?.play()
     }
 
     private func refreshWeather() async {
