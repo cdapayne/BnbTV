@@ -207,7 +207,7 @@ struct ContentView: View {
                         RoundedRectangle(cornerRadius: 20)
                             .stroke(Color.white, lineWidth: isFocused ? 6 : 0)
                     )
-                    .scaleEffect(isFocused ? 1.05 : 1.0)
+                    .scaleEffect(isFocused ? 1.2 : 1.0)
                     .cornerRadius(20)
                     .animation(.easeInOut(duration: 0.1), value: isFocused)
             }
