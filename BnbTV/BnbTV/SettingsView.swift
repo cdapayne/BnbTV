@@ -119,8 +119,13 @@ struct SettingsView: View {
             }
 
             Section("House Rules") {
+#if os(tvOS)
+                TextField("House Rules", text: $houseRules)
+                    .frame(height: 150)
+#else
                 TextEditor(text: $houseRules)
                     .frame(height: 150)
+#endif
             }
 
             Section("Zip Code") {
