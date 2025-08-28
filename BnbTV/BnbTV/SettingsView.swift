@@ -9,13 +9,10 @@ import SwiftUI
 
 struct SettingsView: View {
     @AppStorage("userName") private var userName: String = "Guest"
-    @AppStorage("backgroundImage") private var backgroundImageName: String = ""
+    @AppStorage("backgroundImage") private var backgroundImage: String = "back1"
     @AppStorage("zipCode") private var zipCode: String = ""
 
-    private let imageOptions: [String] = {
-        let urls = Bundle.main.urls(forResourcesWithExtension: nil, subdirectory: "photos") ?? []
-        return urls.map { $0.deletingPathExtension().lastPathComponent }
-    }()
+    private let backgrounds = ["TVback", "back1", "back1"]
 
     var body: some View {
         Form {
@@ -24,15 +21,20 @@ struct SettingsView: View {
             }
 
             Section("Background") {
-                Picker("Background", selection: $backgroundImageName) {
-                    ForEach(imageOptions, id: \.self) { name in
-                        Text(name)
+                Picker("Background", selection: $backgroundImage) {
+                    ForEach(backgrounds, id: \.self) { bg in
+                        Image(bg)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 120, height: 80)
+                            .clipped()
+                            .tag(bg)
                     }
                 }
-                .pickerStyle(.wheel)
+                .pickerStyle(.menu)
             }
 
-            Section("Weather") {
+            Section("Zip Code") {
                 TextField("Zip Code", text: $zipCode)
                     .keyboardType(.numberPad)
             }
@@ -44,4 +46,3 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
 }
-

@@ -29,9 +29,32 @@
 		A093D20C2E5FF568001BD3CA /* BnbTVUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BnbTVUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A093D2602E604E1B001BD3CA /* Exceptions for "BnbTV" folder in "BnbTVTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				photos/back1.png,
+				photos/TVback.png,
+			);
+			target = A093D2012E5FF568001BD3CA /* BnbTVTests */;
+		};
+		A093D2612E604E1B001BD3CA /* Exceptions for "BnbTV" folder in "BnbTVUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				photos/back1.png,
+				photos/TVback.png,
+			);
+			target = A093D20B2E5FF568001BD3CA /* BnbTVUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A093D1F72E5FF567001BD3CA /* BnbTV */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A093D2602E604E1B001BD3CA /* Exceptions for "BnbTV" folder in "BnbTVTests" target */,
+				A093D2612E604E1B001BD3CA /* Exceptions for "BnbTV" folder in "BnbTVUITests" target */,
+			);
 			path = BnbTV;
 			sourceTree = "<group>";
 		};
