@@ -27,7 +27,9 @@ struct SettingsView: View {
     private let backgrounds: [BackgroundOption] = [
         .image("TVback"),
         .image("back1"),
-        .video("beach.mp4")
+        .video("beach.mp4"),
+        .video("beach2.mov"),
+        .video("beach3.mov")
     ]
 
     var body: some View {

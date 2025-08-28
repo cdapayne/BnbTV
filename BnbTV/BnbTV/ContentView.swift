@@ -121,18 +121,24 @@ struct ContentView: View {
     }
 
     private var backgroundView: some View {
-        Group {
-            if backgroundMediaName.hasSuffix(".mp4"),
-               let url = Bundle.main.url(forResource: String(backgroundMediaName.dropLast(4)), withExtension: "mp4") {
-                LoopingVideoView(url: url)
-            } else if let image = UIImage(named: backgroundMediaName) {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                Color.blue
-            }
-        }
+           Group {
+               if let url = videoURL(for: backgroundMediaName) {
+                   LoopingVideoView(url: url)
+               } else if let image = UIImage(named: backgroundMediaName) {
+                   Image(uiImage: image)
+                       .resizable()
+                       .scaledToFill()
+               } else {
+                   Color.blue
+               }
+           }
+       }
+    
+    private func videoURL(for name: String) -> URL? {
+        let ext = (name as NSString).pathExtension.lowercased()
+        guard ["mp4", "mov"].contains(ext) else { return nil }
+        let baseName = (name as NSString).deletingPathExtension
+        return Bundle.main.url(forResource: baseName, withExtension: ext)
     }
 
     private func refreshWeather() async {

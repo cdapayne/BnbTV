@@ -35,6 +35,8 @@
 			membershipExceptions = (
 				photos/back1.png,
 				photos/beach.mp4,
+				photos/beach2.mov,
+				photos/beach3.mov,
 				photos/TVback.png,
 			);
 			target = A093D2012E5FF568001BD3CA /* BnbTVTests */;
@@ -44,6 +46,8 @@
 			membershipExceptions = (
 				photos/back1.png,
 				photos/beach.mp4,
+				photos/beach2.mov,
+				photos/beach3.mov,
 				photos/TVback.png,
 			);
 			target = A093D20B2E5FF568001BD3CA /* BnbTVUITests */;
