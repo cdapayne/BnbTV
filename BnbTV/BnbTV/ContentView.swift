@@ -76,7 +76,7 @@ struct ContentView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 40) {
                             ForEach(actions) { action in
-                                NavigationLink(destination: PlaceholderView(title: action.rawValue)) {
+                                NavigationLink(destination: destinationView(for: action)) {
                                     VStack {
                                         Image(systemName: action.systemImage)
                                             .resizable()
@@ -85,10 +85,7 @@ struct ContentView: View {
                                         Text(action.rawValue)
                                     }
                                 }
-                                .buttonStyle(.plain)
-                                .frame(width: 400, height: 220)
-                                .background(color(for: buttonColorName))
-                                .cornerRadius(20)
+                                .buttonStyle(HomeButtonStyle(color: color(for: buttonColorName)))
                             }
                         }
                         .padding(.horizontal)
@@ -168,6 +165,27 @@ struct ContentView: View {
         case "black": return .black
         case "transparentgrey": return Color.gray.opacity(0.3)
         default: return .blue
+        }
+    }
+
+    @ViewBuilder
+    private func destinationView(for action: HomeAction) -> some View {
+        switch action {
+        case .rules:
+            HouseRulesView()
+        default:
+            PlaceholderView(title: action.rawValue)
+        }
+    }
+
+    private struct HomeButtonStyle: ButtonStyle {
+        let color: Color
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .frame(width: 400, height: 220)
+                .background(color)
+                .overlay(Color.gray.opacity(configuration.isPressed ? 0.4 : 0))
+                .cornerRadius(20)
         }
     }
 

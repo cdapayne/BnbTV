@@ -37,6 +37,7 @@ struct SettingsView: View {
     @AppStorage("zipCode") private var zipCode: String = ""
     @AppStorage("homeMusic") private var homeMusic: String = ""
     @AppStorage("buttonColor") private var buttonColor: String = "transparentGrey"
+    @AppStorage("houseRules") private var houseRules: String = ""
 
     @State private var showPreview = false
     @State private var musicPlayer: AVAudioPlayer?
@@ -115,6 +116,11 @@ struct SettingsView: View {
                         Text(displayName(for: color)).tag(color)
                     }
                 }
+            }
+
+            Section("House Rules") {
+                TextEditor(text: $houseRules)
+                    .frame(height: 150)
             }
 
             Section("Zip Code") {
