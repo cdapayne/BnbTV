@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import AVFoundation
 
 enum BackgroundOption: Identifiable {
     case color(String)
@@ -33,8 +34,11 @@ struct SettingsView: View {
     @AppStorage("userName") private var userName: String = "Guest"
     @AppStorage("backgroundMedia") private var backgroundMedia: String = "back1"
     @AppStorage("zipCode") private var zipCode: String = ""
+    @AppStorage("homeMusic") private var homeMusic: String = ""
+    @AppStorage("buttonColor") private var buttonColor: String = "transparentGrey"
 
     @State private var showPreview = false
+    @State private var musicPlayer: AVAudioPlayer?
 
     private let backgrounds: [BackgroundOption] = [
         .color("blue"),
@@ -46,6 +50,13 @@ struct SettingsView: View {
         .video("beach2.mov"),
         .video("beach3.mov")
     ]
+
+    private var musicFiles: [String] {
+        Bundle.main.urls(forResourcesWithExtension: "mp3", subdirectory: nil)?
+            .map { $0.lastPathComponent }
+            .sorted() ?? []
+    }
+    private let buttonColors = ["white", "green", "black", "transparentGrey", "blue", "red"]
 
     var body: some View {
         Form {
@@ -84,6 +95,25 @@ struct SettingsView: View {
                     .sheet(isPresented: $showPreview) {
                         backgroundPreview
                     }
+            }
+
+            Section("Home Music") {
+                Picker("Music", selection: $homeMusic) {
+                    Text("None").tag("")
+                    ForEach(musicFiles, id: \.self) { file in
+                        Text(file.replacingOccurrences(of: ".mp3", with: "").capitalized).tag(file)
+                    }
+                }
+                Button("Preview") { previewMusic() }
+                    .disabled(homeMusic.isEmpty)
+            }
+
+            Section("Button Color") {
+                Picker("Button Color", selection: $buttonColor) {
+                    ForEach(buttonColors, id: \.self) { color in
+                        Text(displayName(for: color)).tag(color)
+                    }
+                }
             }
 
             Section("Zip Code") {
@@ -125,7 +155,26 @@ struct SettingsView: View {
         case "red": return .red
         case "green": return .green
         case "blue": return .blue
+        case "white": return .white
+        case "black": return .black
+        case "transparentgrey": return Color.gray.opacity(0.3)
         default: return .blue
+        }
+    }
+
+    private func previewMusic() {
+        guard !homeMusic.isEmpty else { return }
+        let base = (homeMusic as NSString).deletingPathExtension
+        let ext = (homeMusic as NSString).pathExtension
+        guard let url = Bundle.main.url(forResource: base, withExtension: ext) else { return }
+        musicPlayer = try? AVAudioPlayer(contentsOf: url)
+        musicPlayer?.play()
+    }
+
+    private func displayName(for color: String) -> String {
+        switch color {
+        case "transparentGrey": return "Transparent Grey"
+        default: return color.capitalized
         }
     }
 }
