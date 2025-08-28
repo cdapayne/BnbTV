@@ -71,7 +71,7 @@ struct ContentView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 40) {
                             ForEach(actions) { action in
-                                Button(action: {}) {
+                                NavigationLink(destination: PlaceholderView(title: action.rawValue)) {
                                     VStack {
                                         Image(systemName: action.systemImage)
                                             .resizable()
@@ -80,6 +80,7 @@ struct ContentView: View {
                                         Text(action.rawValue)
                                     }
                                 }
+                                .buttonStyle(.plain)
                                 .frame(width: 400, height: 220)
                                 .background(Color.white.opacity(0.3))
                                 .cornerRadius(20)
@@ -122,8 +123,12 @@ struct ContentView: View {
 
     private var backgroundView: some View {
            Group {
-               if let url = videoURL(for: backgroundMediaName) {
+               if backgroundMediaName.hasPrefix("color:") {
+                   let name = backgroundMediaName.replacingOccurrences(of: "color:", with: "")
+                   color(for: name)
+               } else if let url = videoURL(for: backgroundMediaName) {
                    LoopingVideoView(url: url)
+                       .id(backgroundMediaName)
                } else if let image = UIImage(named: backgroundMediaName) {
                    Image(uiImage: image)
                        .resizable()
@@ -139,6 +144,15 @@ struct ContentView: View {
         guard ["mp4", "mov"].contains(ext) else { return nil }
         let baseName = (name as NSString).deletingPathExtension
         return Bundle.main.url(forResource: baseName, withExtension: ext)
+    }
+
+    private func color(for name: String) -> Color {
+        switch name.lowercased() {
+        case "red": return .red
+        case "green": return .green
+        case "blue": return .blue
+        default: return .blue
+        }
     }
 
     private func refreshWeather() async {
