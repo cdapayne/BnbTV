@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import AVKit
 
 /// Represents the buttons shown along the bottom of the home screen.
 enum HomeAction: String, CaseIterable, Identifiable {
@@ -38,7 +39,7 @@ enum HomeAction: String, CaseIterable, Identifiable {
 
 struct ContentView: View {
     @AppStorage("userName") private var userName: String = "Guest"
-    @AppStorage("backgroundImage") private var backgroundImageName: String = ""
+    @AppStorage("backgroundMedia") private var backgroundMediaName: String = ""
     @AppStorage("zipCode") private var zipCode: String = ""
 
     @State private var weather: WeatherData?
@@ -79,7 +80,7 @@ struct ContentView: View {
                                         Text(action.rawValue)
                                     }
                                 }
-                                .frame(width: 400, height: 120)
+                                .frame(width: 400, height: 220)
                                 .background(Color.white.opacity(0.3))
                                 .cornerRadius(20)
                             }
@@ -121,7 +122,10 @@ struct ContentView: View {
 
     private var backgroundView: some View {
         Group {
-            if let image = UIImage(named: backgroundImageName) {
+            if backgroundMediaName.hasSuffix(".mp4"),
+               let url = Bundle.main.url(forResource: String(backgroundMediaName.dropLast(4)), withExtension: "mp4") {
+                LoopingVideoView(url: url)
+            } else if let image = UIImage(named: backgroundMediaName) {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
