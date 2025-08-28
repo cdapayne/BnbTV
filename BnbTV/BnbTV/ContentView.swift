@@ -44,6 +44,7 @@ struct ContentView: View {
     @AppStorage("zipCode") private var zipCode: String = ""
     @AppStorage("homeMusic") private var homeMusicName: String = ""
     @AppStorage("buttonColor") private var buttonColorName: String = "transparentGrey"
+    @EnvironmentObject private var configManager: ConfigManager
 
     @State private var weather: WeatherData?
     @State private var currentDate: Date = Date()
@@ -66,10 +67,21 @@ struct ContentView: View {
                     .ignoresSafeArea()
 
                 VStack(alignment: .leading, spacing: 40) {
-                    Text("Welcome")
-                        .font(.system(size: 80, weight: .bold))
-                    Text(userName)
-                        .font(.system(size: 60, weight: .semibold))
+                    if let welcome = configManager.screen(ofType: .welcome) {
+                        Text(welcome.title)
+                            .font(.system(size: 80, weight: .bold))
+                        Text(userName)
+                            .font(.system(size: 60, weight: .semibold))
+                        if let body = welcome.body {
+                            Text(body)
+                                .font(.title2)
+                        }
+                    } else {
+                        Text("Welcome")
+                            .font(.system(size: 80, weight: .bold))
+                        Text(userName)
+                            .font(.system(size: 60, weight: .semibold))
+                    }
 
                     Spacer()
 
@@ -172,7 +184,35 @@ struct ContentView: View {
     private func destinationView(for action: HomeAction) -> some View {
         switch action {
         case .rules:
-            HouseRulesView()
+            if let screen = configManager.screen(ofType: .rules) {
+                ScreenView(screen: screen)
+            } else {
+                HouseRulesView()
+            }
+        case .wifi:
+            if let screen = configManager.screen(ofType: .wifi) {
+                ScreenView(screen: screen)
+            } else {
+                PlaceholderView(title: action.rawValue)
+            }
+        case .howTo:
+            if let screen = configManager.screen(ofType: .howto) {
+                ScreenView(screen: screen)
+            } else {
+                PlaceholderView(title: action.rawValue)
+            }
+        case .checkout:
+            if let screen = configManager.screen(ofType: .checkout) {
+                ScreenView(screen: screen)
+            } else {
+                PlaceholderView(title: action.rawValue)
+            }
+        case .emergency:
+            if let screen = configManager.screen(ofType: .contacts) {
+                ScreenView(screen: screen)
+            } else {
+                PlaceholderView(title: action.rawValue)
+            }
         default:
             PlaceholderView(title: action.rawValue)
         }

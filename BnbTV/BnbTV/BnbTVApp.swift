@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct BnbTVApp: App {
+    @StateObject private var configManager = ConfigManager()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(configManager)
+                .task {
+                    await configManager.load()
+                }
         }
     }
 }
