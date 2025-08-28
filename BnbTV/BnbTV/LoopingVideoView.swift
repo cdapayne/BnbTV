@@ -41,7 +41,18 @@ private struct PlayerControllerView: UIViewControllerRepresentable {
         return controller
     }
 
-    func updateUIViewController(_ controller: AVPlayerViewController, context: Context) {}
+    func updateUIViewController(_ controller: AVPlayerViewController, context: Context) {
+        let player = context.coordinator.player
+        // Check if the current item URL differs from the new URL. If so, stop
+        // the existing video before loading and playing the new one.
+        if let currentAsset = player.currentItem?.asset as? AVURLAsset,
+           currentAsset.url != url {
+            player.pause()
+            let item = AVPlayerItem(url: url)
+            context.coordinator.looper = AVPlayerLooper(player: player, templateItem: item)
+            player.play()
+        }
+    }
 
     class Coordinator {
         let player = AVQueuePlayer()
