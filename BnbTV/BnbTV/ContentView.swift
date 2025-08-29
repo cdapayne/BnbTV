@@ -50,6 +50,7 @@ struct ContentView: View {
     @State private var currentDate: Date = Date()
     @State private var audioPlayer: AVAudioPlayer?
     @Environment(\.scenePhase) private var scenePhase
+    @FocusState private var focusedAction: HomeAction?
 
     private let actions = HomeAction.allCases
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
@@ -93,10 +94,11 @@ struct ContentView: View {
                                         Image(systemName: action.systemImage)
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(height: 60)
+                                            .frame(height: focusedAction == action ? 80 : 60)
                                         Text(action.rawValue)
                                     }
                                 }
+                                .focused($focusedAction, equals: action)
                                 .buttonStyle(HomeButtonStyle(color: color(for: buttonColorName)))
                             }
                         }
@@ -220,10 +222,15 @@ struct ContentView: View {
 
     private struct HomeButtonStyle: ButtonStyle {
         let color: Color
+        @Environment(\.isFocused) private var isFocused: Bool
         func makeBody(configuration: Configuration) -> some View {
             configuration.label
                 .frame(width: 400, height: 220)
                 .background(color)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white, lineWidth: isFocused ? 4 : 0)
+                )
                 .overlay(Color.gray.opacity(configuration.isPressed ? 0.4 : 0))
                 .cornerRadius(20)
         }
