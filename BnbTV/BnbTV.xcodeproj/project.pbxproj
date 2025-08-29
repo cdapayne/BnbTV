@@ -37,6 +37,8 @@
 				photos/beach.mp4,
 				photos/beach2.mov,
 				photos/beach3.mov,
+				photos/Music1.mp3,
+				photos/Music2.mp3,
 				photos/TVback.png,
 			);
 			target = A093D2012E5FF568001BD3CA /* BnbTVTests */;
@@ -48,6 +50,8 @@
 				photos/beach.mp4,
 				photos/beach2.mov,
 				photos/beach3.mov,
+				photos/Music1.mp3,
+				photos/Music2.mp3,
 				photos/TVback.png,
 			);
 			target = A093D20B2E5FF568001BD3CA /* BnbTVUITests */;
