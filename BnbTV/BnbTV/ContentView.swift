@@ -49,6 +49,7 @@ struct ContentView: View {
     @State private var weather: WeatherData?
     @State private var currentDate: Date = Date()
     @State private var audioPlayer: AVAudioPlayer?
+    @State private var selectedAction: HomeAction?
     @Environment(\.scenePhase) private var scenePhase
 
     private let actions = HomeAction.allCases
@@ -88,7 +89,11 @@ struct ContentView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 40) {
                             ForEach(actions) { action in
-                                NavigationLink(destination: destinationView(for: action)) {
+                                NavigationLink(
+                                    destination: destinationView(for: action),
+                                    tag: action,
+                                    selection: $selectedAction
+                                ) {
                                     VStack {
                                         Image(systemName: action.systemImage)
                                             .resizable()
@@ -97,7 +102,12 @@ struct ContentView: View {
                                         Text(action.rawValue)
                                     }
                                 }
-                                .buttonStyle(HomeButtonStyle(color: color(for: buttonColorName)))
+                                .buttonStyle(
+                                    HomeButtonStyle(
+                                        color: color(for: buttonColorName),
+                                        isSelected: selectedAction == action
+                                    )
+                                )
                             }
                         }
                         .padding(.horizontal)
@@ -220,11 +230,12 @@ struct ContentView: View {
 
     private struct HomeButtonStyle: ButtonStyle {
         let color: Color
+        let isSelected: Bool
         func makeBody(configuration: Configuration) -> some View {
             configuration.label
                 .frame(width: 400, height: 220)
                 .background(color)
-                .overlay(Color.gray.opacity(configuration.isPressed ? 0.4 : 0))
+                .overlay(Color.gray.opacity((configuration.isPressed || isSelected) ? 0.4 : 0))
                 .cornerRadius(20)
         }
     }
