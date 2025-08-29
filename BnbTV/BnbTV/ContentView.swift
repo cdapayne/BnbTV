@@ -181,12 +181,38 @@ struct ContentView: View {
     private struct HomeButtonStyle: ButtonStyle {
         let color: Color
         func makeBody(configuration: Configuration) -> some View {
+            #if os(tvOS)
+            HomeButton(configuration: configuration, color: color)
+            #else
             configuration.label
                 .frame(width: 400, height: 220)
                 .background(color)
                 .overlay(Color.gray.opacity(configuration.isPressed ? 0.4 : 0))
                 .cornerRadius(20)
+            #endif
         }
+
+        #if os(tvOS)
+        private struct HomeButton: View {
+            let configuration: Configuration
+            let color: Color
+            @Environment(\.isFocused) private var isFocused
+
+            var body: some View {
+                configuration.label
+                    .frame(width: 400, height: 220)
+                    .background(color)
+                    .overlay(Color.gray.opacity(configuration.isPressed ? 0.4 : 0))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.white, lineWidth: isFocused ? 6 : 0)
+                    )
+                    .scaleEffect(isFocused ? 1.2 : 1.0)
+                    .cornerRadius(20)
+                    .animation(.easeInOut(duration: 0.1), value: isFocused)
+            }
+        }
+        #endif
     }
 
     private func playMusic() {
