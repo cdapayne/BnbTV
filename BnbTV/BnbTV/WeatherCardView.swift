@@ -13,19 +13,20 @@ struct WeatherCardView: View {
                         .font(.headline)
                     Text(day.description)
                         .font(.subheadline)
+                        .multilineTextAlignment(.leading)
                     Text("High: \(Int(day.high))°F")
                     Text("Low: \(Int(day.low))°F")
                     Text("Rain: \(Int(day.rainChance))%")
                 }
                 .padding()
-                .frame(width: 300, height: 180, alignment: .leading)
+                .frame(width: 450, height: 220, alignment: .leading)
                 .background(Color.white.opacity(0.3))
                 .cornerRadius(10)
                 .tag(i)
             }
         }
         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-        .frame(width: 300, height: 180)
+        .frame(width: 450, height: 220)
         .onReceive(timer) { _ in
             guard !forecast.isEmpty else { return }
             withAnimation {

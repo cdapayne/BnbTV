@@ -42,6 +42,7 @@ struct SettingsView: View {
     @AppStorage("tvCode") private var tvCode: String = ""
     @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled: Bool = false
     @AppStorage("settingsPasscode") private var settingsPasscode: String = ""
+    @AppStorage("showThemeParks") private var showThemeParks: Bool = true
 
     @EnvironmentObject private var configManager: ConfigManager
 
@@ -68,6 +69,10 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section("Name") {
+                TextField("Name", text: $userName)
+            }
+
             Section {
                 VStack(spacing: 12) {
                     Text(tvCode)
@@ -81,10 +86,6 @@ struct SettingsView: View {
                         .frame(width: 200, height: 200)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
-            }
-
-            Section("Name") {
-                TextField("Name", text: $userName)
             }
 
             Section("Background") {
@@ -137,6 +138,10 @@ struct SettingsView: View {
                         Text(displayName(for: color)).tag(color)
                     }
                 }
+            }
+
+            Section("Home Screen") {
+                Toggle("Show Theme Parks Button", isOn: $showThemeParks)
             }
 
             Section("House Rules") {
