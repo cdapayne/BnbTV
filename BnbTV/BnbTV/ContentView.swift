@@ -107,17 +107,10 @@ struct ContentView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
-                    if (showWeather && !forecast.isEmpty) || showThemeParks {
+                    if showWeather && !forecast.isEmpty {
                         HStack {
                             Spacer()
-                            HStack(spacing: 20) {
-                                if showWeather && !forecast.isEmpty {
-                                    WeatherCardView(forecast: forecast)
-                                }
-                                if showThemeParks {
-                                    ThemeParkCardView()
-                                }
-                            }
+                            WeatherCardView(forecast: forecast)
                         }
                         .frame(maxWidth: .infinity)
                     }
