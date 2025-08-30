@@ -46,6 +46,7 @@ struct ContentView: View {
     @AppStorage("zipCode") private var zipCode: String = ""
     @AppStorage("homeMusic") private var homeMusicName: String = ""
     @AppStorage("buttonColor") private var buttonColorName: String = "transparentGrey"
+    @AppStorage("showThemeParks") private var showThemeParks: Bool = true
     @EnvironmentObject private var configManager: ConfigManager
 
     @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled: Bool = false
@@ -58,7 +59,9 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @FocusState private var focusedAction: HomeAction?
 
-    private let actions = HomeAction.allCases
+    private var actions: [HomeAction] {
+        showThemeParks ? HomeAction.allCases : HomeAction.allCases.filter { $0 != .parks }
+    }
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
 
     @State private var showSettings = false
