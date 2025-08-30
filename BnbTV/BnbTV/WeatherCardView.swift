@@ -9,9 +9,7 @@ struct WeatherCardView: View {
                 ZStack(alignment: .topTrailing) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(day.date, format: Date.FormatStyle().weekday(.abbreviated))
-                            .font(.caption)
-                        Text(weatherEmoji(for: day.description))
-                            .font(.title)
+                            .font(.headline)
                         Text(day.description)
                             .font(.caption2)
                             .multilineTextAlignment(.leading)
@@ -23,9 +21,6 @@ struct WeatherCardView: View {
                             .font(.caption2)
                     }
                     .padding()
-                    Text(day.date, format: Date.FormatStyle().day())
-                        .font(.system(size: 20, weight: .bold))
-                        .padding(8)
                 }
                 .frame(width: 220, height: 220, alignment: .leading)
                 .background(Color.blue.opacity(0.5))
