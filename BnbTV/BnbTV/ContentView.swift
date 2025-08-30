@@ -100,8 +100,11 @@ struct ContentView: View {
                     }
 
                     if !forecast.isEmpty {
-                        WeatherCardView(forecast: forecast)
-                            .frame(width: titleWidth, alignment: .leading)
+                        HStack {
+                            Spacer()
+                            WeatherCardView(forecast: forecast)
+                        }
+                        .frame(maxWidth: .infinity)
                     }
 
                     Spacer()
@@ -131,13 +134,14 @@ struct ContentView: View {
 
                     Spacer().frame(height: 40)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 80)
 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(timeString)
                         .font(.title3)
                     if let weather = weather {
-                        Text("\(weather.description) \(Int(weather.temperature))°F")
+                        Text("\(weatherEmoji(for: weather.description)) \(weather.description) \(Int(weather.temperature))°F")
                             .font(.footnote)
                     }
                     Button {
