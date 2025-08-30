@@ -42,6 +42,7 @@ struct SettingsView: View {
     @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled: Bool = false
     @AppStorage("settingsPasscode") private var settingsPasscode: String = ""
     @AppStorage("showThemeParks") private var showThemeParks: Bool = true
+    @AppStorage("showWeather") private var showWeather: Bool = true
 
     @EnvironmentObject private var configManager: ConfigManager
 
@@ -140,7 +141,8 @@ struct SettingsView: View {
             }
 
             Section("Home Screen") {
-                Toggle("Show Theme Parks Button", isOn: $showThemeParks)
+                Toggle("Show Weather", isOn: $showWeather)
+                Toggle("Show Theme Parks", isOn: $showThemeParks)
             }
 
             Section("Zip Code") {

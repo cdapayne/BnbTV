@@ -47,6 +47,7 @@ struct ContentView: View {
     @AppStorage("homeMusic") private var homeMusicName: String = ""
     @AppStorage("buttonColor") private var buttonColorName: String = "transparentGrey"
     @AppStorage("showThemeParks") private var showThemeParks: Bool = true
+    @AppStorage("showWeather") private var showWeather: Bool = true
     @EnvironmentObject private var configManager: ConfigManager
 
     @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled: Bool = false
@@ -75,6 +76,12 @@ struct ContentView: View {
         return formatter.string(from: currentDate)
     }
 
+    private var dateString: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: currentDate)
+    }
+
     var body: some View {
         NavigationStack {
             ZStack(alignment: .topTrailing) {
@@ -100,10 +107,17 @@ struct ContentView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
-                    if !forecast.isEmpty {
+                    if (showWeather && !forecast.isEmpty) || showThemeParks {
                         HStack {
                             Spacer()
-                            WeatherCardView(forecast: forecast)
+                            HStack(spacing: 20) {
+                                if showWeather && !forecast.isEmpty {
+                                    WeatherCardView(forecast: forecast)
+                                }
+                                if showThemeParks {
+                                    ThemeParkCardView()
+                                }
+                            }
                         }
                         .frame(maxWidth: .infinity)
                     }
@@ -139,9 +153,11 @@ struct ContentView: View {
                 .padding(.leading, 80)
 
                 VStack(alignment: .trailing, spacing: 4) {
+                    Text(dateString)
+                        .font(.footnote)
                     Text(timeString)
                         .font(.title3)
-                    if let weather = weather {
+                    if showWeather, let weather = weather {
                         Text("\(weatherEmoji(for: weather.description)) \(weather.description) \(Int(weather.temperature))°F")
                             .font(.footnote)
                     }
@@ -304,7 +320,7 @@ struct ContentView: View {
     }
 
     private func refreshWeather() async {
-        guard !zipCode.isEmpty else { return }
+        guard showWeather, !zipCode.isEmpty else { return }
         async let current = WeatherManager.shared.fetchWeather(for: zipCode)
         async let forecastData = WeatherManager.shared.fetchForecast(for: zipCode)
         weather = try? await current
