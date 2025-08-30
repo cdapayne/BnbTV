@@ -11,7 +11,7 @@ struct WeatherCardView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(day.date, format: Date.FormatStyle().weekday(.abbreviated))
                         .font(.headline)
-                    Text(day.description)
+                    Text("\(WeatherManager.emoji(for: day.description)) \(day.description)")
                         .font(.subheadline)
                         .multilineTextAlignment(.leading)
                     Text("High: \(Int(day.high))°F")
@@ -20,7 +20,7 @@ struct WeatherCardView: View {
                 }
                 .padding()
                 .frame(width: 450, height: 220, alignment: .leading)
-                .background(Color.white.opacity(0.3))
+                .background(Color.blue.opacity(0.3))
                 .cornerRadius(10)
                 .tag(i)
             }

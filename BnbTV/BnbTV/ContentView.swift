@@ -99,11 +99,6 @@ struct ContentView: View {
                             .frame(width: titleWidth, alignment: .leading)
                     }
 
-                    if !forecast.isEmpty {
-                        WeatherCardView(forecast: forecast)
-                            .frame(width: titleWidth, alignment: .leading)
-                    }
-
                     Spacer()
 
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -133,11 +128,11 @@ struct ContentView: View {
                 }
                 .padding(.leading, 80)
 
-                VStack(alignment: .trailing, spacing: 4) {
+                VStack(alignment: .trailing, spacing: 20) {
                     Text(timeString)
                         .font(.title3)
                     if let weather = weather {
-                        Text("\(weather.description) \(Int(weather.temperature))°F")
+                        Text("\(WeatherManager.emoji(for: weather.description)) \(Int(weather.temperature))°F")
                             .font(.footnote)
                     }
                     Button {
@@ -165,6 +160,11 @@ struct ContentView: View {
                     .alert("Incorrect Passcode", isPresented: $wrongPasscode) {}
                     NavigationLink("", destination: SettingsView(onDismiss: { playMusic() }), isActive: $showSettings)
                         .hidden()
+
+                    if !forecast.isEmpty {
+                        WeatherCardView(forecast: forecast)
+                            .frame(width: 450, alignment: .trailing)
+                    }
                 }
                 .padding()
             }
@@ -194,6 +194,9 @@ struct ContentView: View {
                } else if let url = videoURL(for: backgroundMediaName) {
                    LoopingVideoView(url: url)
                        .id(backgroundMediaName)
+               } else if let url = gifURL(for: backgroundMediaName) {
+                   AnimatedGIFView(url: url)
+                       .id(backgroundMediaName)
                } else if let image = UIImage(named: backgroundMediaName) {
                    Image(uiImage: image)
                        .resizable()
@@ -207,6 +210,13 @@ struct ContentView: View {
     private func videoURL(for name: String) -> URL? {
         let ext = (name as NSString).pathExtension.lowercased()
         guard ["mp4", "mov"].contains(ext) else { return nil }
+        let baseName = (name as NSString).deletingPathExtension
+        return Bundle.main.url(forResource: baseName, withExtension: ext)
+    }
+
+    private func gifURL(for name: String) -> URL? {
+        let ext = (name as NSString).pathExtension.lowercased()
+        guard ext == "gif" else { return nil }
         let baseName = (name as NSString).deletingPathExtension
         return Bundle.main.url(forResource: baseName, withExtension: ext)
     }
