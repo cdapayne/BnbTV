@@ -19,6 +19,7 @@ enum HomeAction: String, CaseIterable, Identifiable {
     case checkout = "Check Out"
     case tvGuide = "TV Guide"
     case localEats = "Local Eats"
+    case parks = "Theme Parks"
     case emergency = "Emergency Contacts"
 
     var id: String { rawValue }
@@ -33,6 +34,7 @@ enum HomeAction: String, CaseIterable, Identifiable {
         case .checkout: return "door.left.hand.open"
         case .tvGuide: return "tv"
         case .localEats: return "fork.knife"
+        case .parks: return "theatermasks"
         case .emergency: return "phone"
         }
     }
@@ -50,6 +52,7 @@ struct ContentView: View {
     @AppStorage("settingsPasscode") private var settingsPasscode: String = ""
 
     @State private var weather: WeatherData?
+    @State private var forecast: [ForecastDay] = []
     @State private var currentDate: Date = Date()
     @State private var audioPlayer: AVAudioPlayer?
     @Environment(\.scenePhase) private var scenePhase
@@ -76,16 +79,26 @@ struct ContentView: View {
                     .ignoresSafeArea()
 
                 VStack(alignment: .leading, spacing: 40) {
+                    let titleWidth = UIScreen.main.bounds.width * 0.5
                     if let welcome = configManager.info?.welcomeMessage {
                         Text(welcome)
                             .font(.system(size: 60, weight: .bold))
+                            .frame(width: titleWidth, alignment: .leading)
                         Text(userName)
                             .font(.system(size: 40, weight: .semibold))
+                            .frame(width: titleWidth, alignment: .leading)
                     } else {
                         Text("Welcome")
                             .font(.system(size: 60, weight: .bold))
+                            .frame(width: titleWidth, alignment: .leading)
                         Text(userName)
                             .font(.system(size: 40, weight: .semibold))
+                            .frame(width: titleWidth, alignment: .leading)
+                    }
+
+                    if !forecast.isEmpty {
+                        WeatherCardView(forecast: forecast)
+                            .frame(width: titleWidth, alignment: .leading)
                     }
 
                     Spacer()
@@ -239,6 +252,9 @@ struct ContentView: View {
             case .localEats:
                 InfoView(title: action.rawValue, content: info.local.recommendations)
 
+            case .parks:
+                ThemeParkView()
+
             case .emergency:
                 let text = "Primary: \(info.contacts.primary)\nEmergency: \(info.contacts.emergency)"
                 InfoView(title: action.rawValue, content: text)
@@ -281,7 +297,10 @@ struct ContentView: View {
 
     private func refreshWeather() async {
         guard !zipCode.isEmpty else { return }
-        weather = try? await WeatherManager.shared.fetchWeather(for: zipCode)
+        async let current = WeatherManager.shared.fetchWeather(for: zipCode)
+        async let forecastData = WeatherManager.shared.fetchForecast(for: zipCode)
+        weather = try? await current
+        forecast = (try? await forecastData) ?? []
     }
 }
 

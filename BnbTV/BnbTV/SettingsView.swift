@@ -43,6 +43,8 @@ struct SettingsView: View {
     @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled: Bool = false
     @AppStorage("settingsPasscode") private var settingsPasscode: String = ""
 
+    @EnvironmentObject private var configManager: ConfigManager
+
     @State private var showPreview = false
     @State private var musicPlayer: AVAudioPlayer?
 
@@ -150,6 +152,12 @@ struct SettingsView: View {
             Section("Zip Code") {
                 TextField("Zip Code", text: $zipCode)
                     .keyboardType(.numberPad)
+            }
+
+            Section("Configuration") {
+                Button("Refresh") {
+                    Task { await configManager.load() }
+                }
             }
 
             Section("Security") {
