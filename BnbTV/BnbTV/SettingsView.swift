@@ -14,6 +14,7 @@ enum BackgroundOption: Identifiable {
     case color(String)
     case image(String)
     case video(String)
+    case gif(String)
 
     var id: String {
         switch self {
@@ -26,7 +27,7 @@ enum BackgroundOption: Identifiable {
     var tag: String {
         switch self {
         case .color(let name): return "color:\(name)"
-        case .image(let name), .video(let name): return name
+        case .image(let name), .video(let name), .gif(let name): return name
         }
     }
 }
@@ -49,16 +50,21 @@ struct SettingsView: View {
     @State private var showPreview = false
     @State private var musicPlayer: AVAudioPlayer?
 
-    private let backgrounds: [BackgroundOption] = [
-        .color("blue"),
-        .color("green"),
-        .color("red"),
-        .image("TVback"),
-        .image("back1"),
-        .video("beach.mp4"),
-        .video("beach2.mov"),
-        .video("beach3.mov")
-    ]
+    private var backgrounds: [BackgroundOption] {
+        var options: [BackgroundOption] = [
+            .color("blue"),
+            .color("green"),
+            .color("red"),
+            .image("TVback"),
+            .image("back1"),
+            .video("beach.mp4"),
+            .video("beach2.mov"),
+            .video("beach3.mov")
+        ]
+        let gifs = Bundle.main.urls(forResourcesWithExtension: "gif", subdirectory: nil)?.map { BackgroundOption.gif($0.lastPathComponent) } ?? []
+        options.append(contentsOf: gifs)
+        return options
+    }
 
     private var musicFiles: [String] {
         Bundle.main.urls(forResourcesWithExtension: "mp3", subdirectory: nil)?
@@ -109,6 +115,9 @@ struct SettingsView: View {
                                 .tag(option.tag)
                         case .video(let name):
                             Label(name, systemImage: "play.rectangle")
+                                .tag(option.tag)
+                        case .gif(let name):
+                            Label(name, systemImage: "photo.on.rectangle.angled")
                                 .tag(option.tag)
                         }
                     }
@@ -187,6 +196,9 @@ struct SettingsView: View {
             } else if let url = videoURL(for: backgroundMedia) {
                 LoopingVideoView(url: url)
                     .id(backgroundMedia)
+            } else if let url = gifURL(for: backgroundMedia) {
+                AnimatedGIFView(url: url)
+                    .id(backgroundMedia)
             } else if let image = UIImage(named: backgroundMedia) {
                 Image(uiImage: image)
                     .resizable()
@@ -201,6 +213,13 @@ struct SettingsView: View {
     private func videoURL(for name: String) -> URL? {
         let ext = (name as NSString).pathExtension.lowercased()
         guard ["mp4", "mov"].contains(ext) else { return nil }
+        let baseName = (name as NSString).deletingPathExtension
+        return Bundle.main.url(forResource: baseName, withExtension: ext)
+    }
+
+    private func gifURL(for name: String) -> URL? {
+        let ext = (name as NSString).pathExtension.lowercased()
+        guard ext == "gif" else { return nil }
         let baseName = (name as NSString).deletingPathExtension
         return Bundle.main.url(forResource: baseName, withExtension: ext)
     }
