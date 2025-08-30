@@ -156,9 +156,10 @@ struct SettingsView: View {
                 Toggle("Require Passcode", isOn: $isPasscodeEnabled)
                 if isPasscodeEnabled {
                     SecureField("Passcode", text: $settingsPasscode)
-                } else {
-                    settingsPasscode = ""
                 }
+            }
+            .onChange(of: isPasscodeEnabled) { enabled in
+                if !enabled { settingsPasscode = "" }
             }
         }
         .navigationTitle("Settings")

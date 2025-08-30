@@ -209,38 +209,48 @@ struct ContentView: View {
 
     @ViewBuilder
     private func destinationView(for action: HomeAction) -> some View {
-        guard let info = configManager.info else {
-            return PlaceholderView(title: action.rawValue)
-        }
-        switch action {
-        case .wifi:
-            let text = "Name: \(info.wifi.name)\nPassword: \(info.wifi.password)"
-            InfoView(title: action.rawValue, content: text)
-        case .rules:
-            let r = info.rules
-            let text = "Checkout: \(r.checkOutTime)\nSmoking: \(r.smokingPolicy)\nPets: \(r.petRules)\nCleaning: \(r.cleaningExpectations)"
-            InfoView(title: action.rawValue, content: text)
-        case .around:
-            let text = "Recommendations:\n\(info.local.recommendations)\n\nHidden Gems:\n\(info.local.hiddenGems)"
-            InfoView(title: action.rawValue, content: text)
-        case .howTo:
-            let text = info.guides.instructions.map { "\($0.item): \($0.direction)" }.joined(separator: "\n")
-            InfoView(title: action.rawValue, content: text)
-        case .checkout:
-            let r = info.rules
-            let p = info.property
-            let text = "Checkout: \(r.checkOutTime)\nCleaning: \(r.cleaningExpectations)\nTrash: \(p.trashRules)\nKeys: \(p.whereToLeaveKeys)"
-            InfoView(title: action.rawValue, content: text)
-        case .localEats:
-            let text = info.local.recommendations
-            InfoView(title: action.rawValue, content: text)
-        case .emergency:
-            let text = "Primary: \(info.contacts.primary)\nEmergency: \(info.contacts.emergency)"
-            InfoView(title: action.rawValue, content: text)
-        case .tvGuide:
+        if let info = configManager.info {
+            switch action {
+            case .wifi:
+                let text = "Name: \(info.wifi.name)\nPassword: \(info.wifi.password)"
+                InfoView(title: action.rawValue, content: text)
+
+            case .rules:
+                let r = info.rules
+                let text = "Checkout: \(r.checkOutTime)\nSmoking: \(r.smokingPolicy)\nPets: \(r.petRules)\nCleaning: \(r.cleaningExpectations)"
+                InfoView(title: action.rawValue, content: text)
+
+            case .around:
+                let text = "Recommendations:\n\(info.local.recommendations)\n\nHidden Gems:\n\(info.local.hiddenGems)"
+                InfoView(title: action.rawValue, content: text)
+
+            case .howTo:
+                let text = info.guides.instructions
+                    .map { "\($0.item): \($0.direction)" }
+                    .joined(separator: "\n")
+                InfoView(title: action.rawValue, content: text)
+
+            case .checkout:
+                let r = info.rules
+                let p = info.property
+                let text = "Checkout: \(r.checkOutTime)\nCleaning: \(r.cleaningExpectations)\nTrash: \(p.trashRules)\nKeys: \(p.whereToLeaveKeys)"
+                InfoView(title: action.rawValue, content: text)
+
+            case .localEats:
+                InfoView(title: action.rawValue, content: info.local.recommendations)
+
+            case .emergency:
+                let text = "Primary: \(info.contacts.primary)\nEmergency: \(info.contacts.emergency)"
+                InfoView(title: action.rawValue, content: text)
+
+            case .tvGuide:
+                PlaceholderView(title: action.rawValue)
+            }
+        } else {
             PlaceholderView(title: action.rawValue)
         }
     }
+
 
     private struct HomeButtonStyle: ButtonStyle {
         let color: Color
