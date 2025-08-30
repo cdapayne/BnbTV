@@ -8,6 +8,7 @@
 import SwiftUI
 import UIKit
 import AVFoundation
+import CoreImage.CIFilterBuiltins
 
 enum BackgroundOption: Identifiable {
     case color(String)
@@ -38,6 +39,9 @@ struct SettingsView: View {
     @AppStorage("homeMusic") private var homeMusic: String = ""
     @AppStorage("buttonColor") private var buttonColor: String = "transparentGrey"
     @AppStorage("houseRules") private var houseRules: String = ""
+    @AppStorage("tvCode") private var tvCode: String = ""
+    @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled: Bool = false
+    @AppStorage("settingsPasscode") private var settingsPasscode: String = ""
 
     @State private var showPreview = false
     @State private var musicPlayer: AVAudioPlayer?
@@ -62,6 +66,21 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section {
+                VStack(spacing: 12) {
+                    Text(tvCode)
+                        .font(.largeTitle)
+                    Text("Scan the QR code below to update your BnB Host TV rules.")
+                        .multilineTextAlignment(.center)
+                        .font(.caption)
+                    Image(uiImage: generateQRCode(from: "https://bnb.paynebrain.com/BxBHostInfo/\(tvCode).json"))
+                        .interpolation(.none)
+                        .resizable()
+                        .frame(width: 200, height: 200)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+            }
+
             Section("Name") {
                 TextField("Name", text: $userName)
             }
@@ -132,6 +151,16 @@ struct SettingsView: View {
                 TextField("Zip Code", text: $zipCode)
                     .keyboardType(.numberPad)
             }
+
+            Section("Security") {
+                Toggle("Require Passcode", isOn: $isPasscodeEnabled)
+                if isPasscodeEnabled {
+                    SecureField("Passcode", text: $settingsPasscode)
+                }
+            }
+            .onChange(of: isPasscodeEnabled) { enabled in
+                if !enabled { settingsPasscode = "" }
+            }
         }
         .navigationTitle("Settings")
         .onDisappear { onDismiss?() }
@@ -189,6 +218,17 @@ struct SettingsView: View {
         case "transparentGrey": return "Transparent Grey"
         default: return color.capitalized
         }
+    }
+
+    private func generateQRCode(from string: String) -> UIImage {
+        let data = string.data(using: .ascii)
+        let filter = CIFilter.qrCodeGenerator()
+        filter.setValue(data, forKey: "inputMessage")
+        let transform = CGAffineTransform(scaleX: 10, y: 10)
+        if let output = filter.outputImage?.transformed(by: transform) {
+            return UIImage(ciImage: output)
+        }
+        return UIImage()
     }
 }
 
