@@ -82,21 +82,22 @@ struct ContentView: View {
                     .ignoresSafeArea()
 
                 VStack(alignment: .leading, spacing: 40) {
-                    let titleWidth = UIScreen.main.bounds.width * 0.5
                     if let welcome = configManager.info?.welcomeMessage {
                         Text(welcome)
                             .font(.system(size: 60, weight: .bold))
-                            .frame(width: titleWidth, alignment: .leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .lineLimit(nil)
                         Text(userName)
-                            .font(.system(size: 40, weight: .semibold))
-                            .frame(width: titleWidth, alignment: .leading)
+                            .font(.system(size: 140, weight: .semibold))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     } else {
                         Text("Welcome")
                             .font(.system(size: 60, weight: .bold))
-                            .frame(width: titleWidth, alignment: .leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .lineLimit(nil)
                         Text(userName)
-                            .font(.system(size: 40, weight: .semibold))
-                            .frame(width: titleWidth, alignment: .leading)
+                            .font(.system(size: 140, weight: .semibold))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
                     if !forecast.isEmpty {

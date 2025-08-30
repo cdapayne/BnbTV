@@ -8,22 +8,27 @@ struct WeatherCardView: View {
     var body: some View {
         TabView(selection: $index) {
             ForEach(Array(forecast.prefix(3).enumerated()), id: \.offset) { i, day in
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(day.date, format: Date.FormatStyle().weekday(.abbreviated))
-                        .font(.headline)
-                    Text(weatherEmoji(for: day.description))
-                        .font(.largeTitle)
-                    Text(day.description)
-                        .font(.subheadline)
-                        .multilineTextAlignment(.leading)
-                    Text("High: \(Int(day.high))°F")
-                    Text("Low: \(Int(day.low))°F")
-                    Text("Rain: \(Int(day.rainChance))%")
+                ZStack(alignment: .topTrailing) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(day.date, format: Date.FormatStyle().weekday(.abbreviated))
+                            .font(.headline)
+                        Text(weatherEmoji(for: day.description))
+                            .font(.largeTitle)
+                        Text(day.description)
+                            .font(.subheadline)
+                            .multilineTextAlignment(.leading)
+                        Text("High: \(Int(day.high))°F")
+                        Text("Low: \(Int(day.low))°F")
+                        Text("Rain: \(Int(day.rainChance))%")
+                    }
+                    .padding()
+                    Text(day.date, format: Date.FormatStyle().day())
+                        .font(.system(size: 40, weight: .bold))
+                        .padding(8)
                 }
-                .padding()
                 .frame(width: 450, height: 220, alignment: .leading)
-                .background(Color.blue.opacity(0.3))
-                .cornerRadius(10)
+                .background(Color.blue.opacity(0.5))
+                .cornerRadius(25)
                 .tag(i)
             }
         }
