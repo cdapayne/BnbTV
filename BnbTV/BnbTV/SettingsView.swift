@@ -38,7 +38,6 @@ struct SettingsView: View {
     @AppStorage("zipCode") private var zipCode: String = ""
     @AppStorage("homeMusic") private var homeMusic: String = ""
     @AppStorage("buttonColor") private var buttonColor: String = "transparentGrey"
-    @AppStorage("houseRules") private var houseRules: String = ""
     @AppStorage("tvCode") private var tvCode: String = ""
     @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled: Bool = false
     @AppStorage("settingsPasscode") private var settingsPasscode: String = ""
@@ -142,16 +141,6 @@ struct SettingsView: View {
 
             Section("Home Screen") {
                 Toggle("Show Theme Parks Button", isOn: $showThemeParks)
-            }
-
-            Section("House Rules") {
-#if os(tvOS)
-                TextField("House Rules", text: $houseRules)
-                    .frame(height: 150)
-#else
-                TextEditor(text: $houseRules)
-                    .frame(height: 150)
-#endif
             }
 
             Section("Zip Code") {
