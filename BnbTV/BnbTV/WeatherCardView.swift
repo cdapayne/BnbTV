@@ -7,21 +7,24 @@ struct WeatherCardView: View {
         HStack(spacing: 20) {
             ForEach(Array(forecast.prefix(3).enumerated()), id: \.offset) { _, day in
                 ZStack(alignment: .topTrailing) {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(day.date, format: Date.FormatStyle().weekday(.abbreviated))
-                            .font(.headline)
+                            .font(.caption)
                         Text(weatherEmoji(for: day.description))
-                            .font(.largeTitle)
+                            .font(.title)
                         Text(day.description)
-                            .font(.subheadline)
+                            .font(.caption2)
                             .multilineTextAlignment(.leading)
                         Text("High: \(Int(day.high))°F")
+                            .font(.caption2)
                         Text("Low: \(Int(day.low))°F")
+                            .font(.caption2)
                         Text("Rain: \(Int(day.rainChance))%")
+                            .font(.caption2)
                     }
                     .padding()
                     Text(day.date, format: Date.FormatStyle().day())
-                        .font(.system(size: 24, weight: .bold))
+                        .font(.system(size: 20, weight: .bold))
                         .padding(8)
                 }
                 .frame(width: 220, height: 220, alignment: .leading)
