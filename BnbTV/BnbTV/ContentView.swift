@@ -46,6 +46,9 @@ struct ContentView: View {
     @AppStorage("buttonColor") private var buttonColorName: String = "transparentGrey"
     @EnvironmentObject private var configManager: ConfigManager
 
+    @AppStorage("isPasscodeEnabled") private var isPasscodeEnabled: Bool = false
+    @AppStorage("settingsPasscode") private var settingsPasscode: String = ""
+
     @State private var weather: WeatherData?
     @State private var currentDate: Date = Date()
     @State private var audioPlayer: AVAudioPlayer?
@@ -54,6 +57,11 @@ struct ContentView: View {
 
     private let actions = HomeAction.allCases
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+
+    @State private var showSettings = false
+    @State private var showPasscodePrompt = false
+    @State private var enteredPasscode = ""
+    @State private var wrongPasscode = false
 
     private var timeString: String {
         let formatter = DateFormatter()
@@ -68,20 +76,16 @@ struct ContentView: View {
                     .ignoresSafeArea()
 
                 VStack(alignment: .leading, spacing: 40) {
-                    if let welcome = configManager.screen(ofType: .welcome) {
-                        Text(welcome.title)
-                            .font(.system(size: 80, weight: .bold))
+                    if let welcome = configManager.info?.welcomeMessage {
+                        Text(welcome)
+                            .font(.system(size: 60, weight: .bold))
                         Text(userName)
-                            .font(.system(size: 60, weight: .semibold))
-                        if let body = welcome.body {
-                            Text(body)
-                                .font(.title2)
-                        }
+                            .font(.system(size: 40, weight: .semibold))
                     } else {
                         Text("Welcome")
-                            .font(.system(size: 80, weight: .bold))
+                            .font(.system(size: 60, weight: .bold))
                         Text(userName)
-                            .font(.system(size: 60, weight: .semibold))
+                            .font(.system(size: 40, weight: .semibold))
                     }
 
                     Spacer()
@@ -120,10 +124,31 @@ struct ContentView: View {
                         Text("\(weather.description) \(Int(weather.temperature))°F")
                             .font(.footnote)
                     }
-                    NavigationLink(destination: SettingsView(onDismiss: { playMusic() })) {
+                    Button {
+                        if isPasscodeEnabled && !settingsPasscode.isEmpty {
+                            showPasscodePrompt = true
+                        } else {
+                            showSettings = true
+                        }
+                    } label: {
                         Image(systemName: "gearshape")
                             .font(.system(size: 40))
                     }
+                    .alert("Enter Passcode", isPresented: $showPasscodePrompt) {
+                        SecureField("Passcode", text: $enteredPasscode)
+                        Button("OK") {
+                            if enteredPasscode == settingsPasscode {
+                                showSettings = true
+                            } else {
+                                wrongPasscode = true
+                            }
+                            enteredPasscode = ""
+                        }
+                        Button("Cancel", role: .cancel) { enteredPasscode = "" }
+                    }
+                    .alert("Incorrect Passcode", isPresented: $wrongPasscode) {}
+                    NavigationLink("", destination: SettingsView(onDismiss: { playMusic() }), isActive: $showSettings)
+                        .hidden()
                 }
                 .padding()
             }
@@ -184,38 +209,35 @@ struct ContentView: View {
 
     @ViewBuilder
     private func destinationView(for action: HomeAction) -> some View {
+        guard let info = configManager.info else {
+            return PlaceholderView(title: action.rawValue)
+        }
         switch action {
-        case .rules:
-            if let screen = configManager.screen(ofType: .rules) {
-                ScreenView(screen: screen)
-            } else {
-                HouseRulesView()
-            }
         case .wifi:
-            if let screen = configManager.screen(ofType: .wifi) {
-                ScreenView(screen: screen)
-            } else {
-                PlaceholderView(title: action.rawValue)
-            }
+            let text = "Name: \(info.wifi.name)\nPassword: \(info.wifi.password)"
+            InfoView(title: action.rawValue, content: text)
+        case .rules:
+            let r = info.rules
+            let text = "Checkout: \(r.checkOutTime)\nSmoking: \(r.smokingPolicy)\nPets: \(r.petRules)\nCleaning: \(r.cleaningExpectations)"
+            InfoView(title: action.rawValue, content: text)
+        case .around:
+            let text = "Recommendations:\n\(info.local.recommendations)\n\nHidden Gems:\n\(info.local.hiddenGems)"
+            InfoView(title: action.rawValue, content: text)
         case .howTo:
-            if let screen = configManager.screen(ofType: .howto) {
-                ScreenView(screen: screen)
-            } else {
-                PlaceholderView(title: action.rawValue)
-            }
+            let text = info.guides.instructions.map { "\($0.item): \($0.direction)" }.joined(separator: "\n")
+            InfoView(title: action.rawValue, content: text)
         case .checkout:
-            if let screen = configManager.screen(ofType: .checkout) {
-                ScreenView(screen: screen)
-            } else {
-                PlaceholderView(title: action.rawValue)
-            }
+            let r = info.rules
+            let p = info.property
+            let text = "Checkout: \(r.checkOutTime)\nCleaning: \(r.cleaningExpectations)\nTrash: \(p.trashRules)\nKeys: \(p.whereToLeaveKeys)"
+            InfoView(title: action.rawValue, content: text)
+        case .localEats:
+            let text = info.local.recommendations
+            InfoView(title: action.rawValue, content: text)
         case .emergency:
-            if let screen = configManager.screen(ofType: .contacts) {
-                ScreenView(screen: screen)
-            } else {
-                PlaceholderView(title: action.rawValue)
-            }
-        default:
+            let text = "Primary: \(info.contacts.primary)\nEmergency: \(info.contacts.emergency)"
+            InfoView(title: action.rawValue, content: text)
+        case .tvGuide:
             PlaceholderView(title: action.rawValue)
         }
     }
